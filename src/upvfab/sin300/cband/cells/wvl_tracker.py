@@ -14,7 +14,7 @@ from upvfab.sin300.cband.tech import LAYER, TECH
 
 @gf.cell
 def mmi2x2(
-    width: float | None = None,
+    width: float = TECH.width,
     width_taper: float = 1.5,
     length_taper: float = 20.0,
     length_mmi: float = 42.5,
@@ -50,7 +50,7 @@ mmi2x2_rib = partial(mmi2x2, length_mmi=44.8, gap_mmi=0.53, cross_section="rib")
 
 @gf.cell
 def mmi3x3(
-    width: float | None = None,
+    width: float = TECH.width,
     width_taper: float = 1.0,
     length_taper: float = 10.0,
     length_mmi: float = 20.0,
@@ -150,7 +150,7 @@ def mmi3x3(
 
 @gf.cell
 def spiral_upv(
-    radius: float = 100.0,
+    radius: float = TECH.radius,
     N_spr: int = 5,
     d_SPR: float = 7.0,
     dx_SPR: float = 10.0,
@@ -247,7 +247,7 @@ import numpy as np
 
 def define_spiral_length(delay_length=10000,
                          N_spr=7,
-                         radius=100,
+                         radius=125,
                          d_SPR=10,
                          dy_SPR=20,
                          ):
@@ -269,7 +269,7 @@ def bend_euler(
     radius: float = TECH.radius_strip,
     angle: float = 90,
     p: float = 0.5,
-    width: float | None = None,
+    width: float = TECH.radius,
     cross_section: CrossSectionSpec = "strip",
     allow_min_radius_violation: bool = False,
 ) -> gf.Component:
@@ -342,27 +342,27 @@ def die(dieL = 5000, dieW = 5000, border = 250, layer_box = "FLOORPLAN"):
 
 
 # N espiral TIENE QUE SER PAR
-def wvl_tracker(length_spiral: float = 2152.431640625, length_mmi_2x2: float = 262.9723, taper_width_mmi_2x2: float = 2.8, gap_mmi_2x2: float = 0.5,  taper_length = 10,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  AL: float = 56000): #mejorarlo poniendo las funciones de espiral dentro
+def wvl_tracker(length_spiral: float = 2152.431640625, length_mmi_2x2: float = 262.9723, taper_width_mmi_2x2: float = 2.8, gap_mmi_2x2: float = 0.5,  taper_length = 10,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
    
-    mmi_95 = c << mmi2x2(0.45, taper_width_mmi_2x2, taper_length, length_mmi_2x2, 10, gap_mmi_2x2)
-    mmi_33 = c << mmi3x3(width= 0.45, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
-    spiral = c << spiral_upv(radius = 10, N_spr = 10 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 10, layer = "strip") # N must BE EVEN 
-    b1 = c << bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b2 = c << bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
+    mmi_95 = c << mmi2x2(width, taper_width_mmi_2x2, taper_length, length_mmi_2x2, 10, gap_mmi_2x2)
+    mmi_33 = c << mmi3x3(width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
+    spiral = c << spiral_upv(radius = radius, N_spr = 10 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 10, layer = "strip") # N must BE EVEN 
+    b1 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b2 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     
     
     h = spiral.ports["o2"].dx - spiral.ports["o1"].dx
-    wvg_up = c << gf.components.straight(length = h, cross_section= "strip", width = 0.45)
+    wvg_up = c << gf.components.straight(length = h, cross_section= "strip", width = width)
     f_bend_euler180 = partial(bend_euler,angle=180)
-    delay_1 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = 0.45)
-    delay_2 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = 0.45)
+    delay_1 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = width)
+    delay_2 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = width)
 
     dy_mmi95 = mmi_95.ports["o3"].dy - mmi_95.ports["o4"].dy #para conectar los s_bend de forma que las entradas a los mmi queden a la misma altura
     dy_mmi33 = mmi_33.ports["o3"].dy - mmi_33.ports["o1"].dy
     h_bends_33 = (2*15 + dy_mmi95 - dy_mmi33)/2
-    b3 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
     
 
     delay_1.mirror_x().mirror_y()
@@ -382,15 +382,15 @@ def wvl_tracker(length_spiral: float = 2152.431640625, length_mmi_2x2: float = 2
     wvg_up.dmovex(b2.ports["o2"].dx).dmovey(b2.ports["o2"].dy)
 
     #bends entrada y salida cto
-    b5 = c <<bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b6 = c << bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
+    b5 = c <<bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b6 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b5.mirror_x()
     b5.mirror_y()
     b5.dmovex(mmi_95.ports["o1"].dx).dmovey(mmi_95.ports["o1"].dy)
     b6.mirror_x()
     b6.dmovex(mmi_95.ports["o2"].dx).dmovey(mmi_95.ports["o2"].dy)
-    b7 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b8 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
+    b7 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b8 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
     wvg = c << gf.components.straight(10, cross_section = "strip")
     b7.mirror_y()
     b8.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
@@ -422,18 +422,18 @@ def wvl_tracker(length_spiral: float = 2152.431640625, length_mmi_2x2: float = 2
 #########################################################################################
 
 @gf.cell
-def mmi_2x2_test(length_mmi_2x2: float = 262.9723, taper_width_mmi_2x2: float = 2.8, gap_mmi_2x2: float = 0.5,  taper_length = 10):
+def mmi_2x2_test(length_mmi_2x2: float = 262.9723, taper_width_mmi_2x2: float = 2.8, gap_mmi_2x2: float = 0.5,  taper_length = 10, width: float = TECH.width):
     c = gf.Component()
 
-    mmi_95 = c << mmi2x2(0.45, taper_width_mmi_2x2, taper_length, length_mmi_2x2, 10, gap_mmi_2x2)
-    b1 = c << bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b2 = c << bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
+    mmi_95 = c << mmi2x2(width, taper_width_mmi_2x2, taper_length, length_mmi_2x2, 10, gap_mmi_2x2)
+    b1 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b2 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b1.mirror_x()
     mmi_95.dmovex(b1.ports["o2"].dx - length_mmi_2x2 - taper_length).dmovey(b1.ports["o2"].dy + taper_width_mmi_2x2/2  + gap_mmi_2x2/2) 
     b2.dmovex(mmi_95.ports["o3"].dx).dmovey(mmi_95.ports["o3"].dy)
 
-    b3 = c << bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, 15], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b3.mirror_x()
     b3.mirror_y()
     b3.dmovex(mmi_95.ports["o1"].dx).dmovey(mmi_95.ports["o1"].dy)
@@ -452,15 +452,15 @@ def mmi_2x2_test(length_mmi_2x2: float = 262.9723, taper_width_mmi_2x2: float = 
     return c
 
 @gf.cell
-def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, altura_bends: float = 13.649999999999999 ): #altura bends heredado de cto: h_bends_33
+def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, altura_bends: float = 13.649999999999999, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
 
     c = gf.Component()
 
-    mmi_33 = c << mmi3x3(width= 0.45, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
-    b1 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b2 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b3 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = 0.45, allow_min_radius_violation = True)
+    mmi_33 = c << mmi3x3(width= width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
+    b1 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b2 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
     wvg = c << gf.components.straight(10, cross_section = "strip")
     
     b1.mirror_x()
@@ -486,13 +486,13 @@ def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float =
     return c
 
 @gf.cell
-def spiral_delays_test(length_spiral: float = 2152.431640625 ):
+def spiral_delays_test(length_spiral: float = 2152.431640625, width : float = TECH.width, radius: float = TECH.radius ):
     c = gf.Component()
-    spiral = c << spiral_upv(radius = 10, N_spr = 10 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 10, layer = "strip") # N must BE EVEN 
+    spiral = c << spiral_upv(radius = radius, N_spr = 10 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 10, layer = "strip") # N must BE EVEN 
     h = spiral.ports["o2"].dx - spiral.ports["o1"].dx
     f_bend_euler180 = partial(bend_euler,angle=180)
-    delay_1 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = 0.45)
-    delay_2 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = 0.45)
+    delay_1 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = width)
+    delay_2 = c << gf.components.delay_snake(length=h/2, length0=0, length2=0, n=2, bend180=f_bend_euler180(), cross_section='strip', width = width)
     delay_1.mirror_x().mirror_y()
     delay_1.dmovex(spiral.ports["o1"].dx ).dmovey(spiral.ports["o1"].dy) 
     delay_2.mirror_y()

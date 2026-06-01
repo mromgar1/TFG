@@ -130,11 +130,11 @@ LAYER_VIEWS = gf.technology.LayerViews(PATH.lyp_yaml)
 class Tech:
     """Technology parameters."""
 
-    radius = 100
-    radius_strip = 100
+    radius = 125
+    radius_strip = 125
     radius_rib = 100
     radius_ro = 25
-    width = 1.2
+    width = 1
     width_rib = 1.0
     width_ro = 0.5
 
