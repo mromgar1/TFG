@@ -269,7 +269,7 @@ def bend_euler(
     radius: float = TECH.radius_strip,
     angle: float = 90,
     p: float = 0.5,
-    width: float = TECH.radius,
+    width: float = TECH.width,
     cross_section: CrossSectionSpec = "strip",
     allow_min_radius_violation: bool = False,
 ) -> gf.Component:
@@ -347,7 +347,7 @@ def wvl_tracker(length_spiral: float = 2152.431640625, length_mmi_2x2: float = 2
    
     mmi_95 = c << mmi2x2(width, taper_width_mmi_2x2, taper_length, length_mmi_2x2, 10, gap_mmi_2x2)
     mmi_33 = c << mmi3x3(width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
-    spiral = c << spiral_upv(radius = radius, N_spr = 10 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 10, layer = "strip") # N must BE EVEN 
+    spiral = c << spiral_upv(radius = radius, N_spr = 12 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 50, layer = "strip") # N must BE EVEN 
     b1 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b2 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     
