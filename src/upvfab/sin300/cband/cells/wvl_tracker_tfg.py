@@ -117,6 +117,37 @@ def b_symmetric_mmi(L_mmi=144.7, W_mmi=10, Aw = 0.72, L_wg=20, lt=50, wt=1.0, Wt
     return c
 
 @gf.cell
+def mmi_2x2_bends(length_mmi_2x2: float = 262.9723, width: float = TECH.width):
+    c = gf.Component()
+
+    mmi_95 = c << b_symmetric_mmi(length_mmi_2x2)
+    b1 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b2 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b1.mirror_y()
+    b1.dmovex(mmi_95.ports['o4'].dx).dmovey(mmi_95.ports['o4'].dy)
+    b2.dmovex(mmi_95.ports["o3"].dx).dmovey(mmi_95.ports["o3"].dy)
+
+    b3 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b3.mirror_x()
+    b3.mirror_y()
+    b3.dmovex(mmi_95.ports["o1"].dx).dmovey(mmi_95.ports["o1"].dy)
+    b4.mirror_x()
+    b4.dmovex(mmi_95.ports["o2"].dx).dmovey(mmi_95.ports["o2"].dy)
+
+    c.add_port(name = "o2", port = b4.ports["o2"], port_type = "optical")
+    c.add_port(name = "o1", port = b3.ports["o2"], port_type = "optical")
+    c.add_port(name = "o3", port = b2.ports["o2"], port_type = "optical")
+    c.add_port(name = "o4", port = b1.ports["o2"], port_type = "optical")
+
+    #normalizar posición para que quede en (0,0)
+    x0, y0 = c.ports["o1"].dcenter
+    c.dmove((-x0, -y0))
+
+    return c
+
+
+@gf.cell
 def mmi3x3(
     width: float = TECH.width,
     width_taper: float = 1.0,
