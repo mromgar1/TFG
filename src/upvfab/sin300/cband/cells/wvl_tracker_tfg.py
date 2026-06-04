@@ -420,6 +420,17 @@ def bend_s(
         width=width,
     )
 
+def terminator(number_of_loops: float=6, min_bend_radius = 125, width_tip = 0.6): 
+    return gf.components.terminator_spiral(number_of_loops=number_of_loops, min_bend_radius=min_bend_radius, width_tip=width_tip)
+ 
+
+
+##################################################################################################################################
+
+#                                                   CIRCUITO
+
+##################################################################################################################################
+
 @gf.cell
 def wvl_tracker(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
@@ -482,3 +493,111 @@ def wvl_tracker(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2
     c.dmove((-x0, -y0))
 
     return c 
+
+################################################################################################################################################
+
+#                                                    ESTRUCTURAS TEST
+
+################################################################################################################################################
+
+@gf.cell
+def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, altura_bends: float = 13.649999999999999, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
+
+    c = gf.Component()
+
+    mmi_33 = c << mmi3x3(width= width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
+    b1 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b2 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    wvg = c << gf.components.straight(10, cross_section = "strip")
+    
+    b1.mirror_x()
+    b1.mirror_y()
+    b1.dmovex(mmi_33.ports["o1"].dx).dmovey(mmi_33.ports["o1"].dy)
+    b2.mirror_x()
+    b2.dmovex(mmi_33.ports["o3"].dx).dmovey(mmi_33.ports["o3"].dy)
+    b3.mirror_y()
+    b4.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
+    b3.dmovex(mmi_33.ports["o6"].dx).dmovey(mmi_33.ports["o6"].dy)
+    wvg.dmovex(mmi_33.ports["o5"].dx).dmovey(mmi_33.ports["o5"].dy)
+
+    c.add_port(name = "o1", port = b2.ports["o2"], port_type = "optical")
+    c.add_port(name = "o2", port = b1.ports["o2"], port_type = "optical")
+    c.add_port(name = "o3", port = b4.ports["o2"], port_type = "optical")
+    c.add_port(name = "o4", port = wvg.ports["o2"], port_type = "optical")
+    c.add_port(name = "o5", port = b3.ports["o2"], port_type = "optical")
+    
+    #normalizar posición para que quede en (0,0)
+    x0, y0 = c.ports["o1"].dcenter
+    c.dmove((-x0, -y0))
+
+    return c
+
+@gf.cell
+def mmi_ts(
+    mmi: ComponentSpec = "mmi2x2",
+    x_total: float = 10000,
+    x_margin: float = 250,
+    y_total: float = 3*127,
+    invert: bool = False,
+    n: int = 4,
+    add_terminators: bool = False,  
+) -> gf.Component:
+    c = gf.Component()
+    mmi = gf.get_component(mmi)
+    mmi_xsize = mmi['o3'].dx - mmi['o1'].dx
+    mmi_ysize = mmi['o2'].dy - mmi['o1'].dy
+    # print(mmi_xsize)
+    # print(mmi_ysize)
+ 
+    if n == 1:
+        x_pad = 0
+        y_pad = 0
+    else:
+        x_pad = (1/(n-1))*(x_total - 2*x_margin - n*mmi_xsize)
+        y_pad = (1/(n-1))*y_total - mmi_ysize
+ 
+    # print(x_pad)
+    # print(y_pad)
+ 
+    mmis = []
+    for i in np.arange(0,n):
+        mmis.append(c.add_ref(mmi))
+        mmis[i].dmovex(i*(x_pad+mmi_xsize)).dmovey((-1)**(int(invert))*i*(y_pad+mmi_ysize))
+ 
+    c.add_port(name = f'o1', port = mmis[0].ports['o1'])
+    c.add_port(name = f'o2', port = mmis[0].ports['o2'])
+    port_count = 2
+ 
+    # invert=False  -> variante "bar"  : conecta o3 -> o2 del siguiente, tap = o4
+    # invert=True   -> variante "cross": conecta o4 -> o2 del siguiente, tap = o3
+    cascade_out_port = "o4" if invert else "o3"
+    tap_port = "o3" if invert else "o4"
+    next_input_port = "o2"
+    unused_input_port = "o1"
+ 
+    for i, mmi_ref in enumerate(mmis):
+        if (i != (n-1)):
+            gf.routing.route_single_sbend(
+                c,
+                mmi_ref[cascade_out_port],            
+                mmis[i+1][next_input_port],          
+                cross_section='strip'
+            )
+ 
+            if add_terminators:
+                term = c.add_ref(gf.components.terminator_spiral(number_of_loops=6,
+                                                                 min_bend_radius=35,
+                                                                 width_tip=0.6))
+                term.connect("o1", mmis[i+1].ports[unused_input_port])
+ 
+            c.add_port(name = f'o{port_count+1}', port = mmi_ref.ports[tap_port])
+            port_count += 1
+ 
+    c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[cascade_out_port])
+    port_count += 1
+    c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[tap_port])
+ 
+    return c
+

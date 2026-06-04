@@ -12,315 +12,315 @@ from gdsfactory.typings import LayerSpec, Size
 from upvfab.sin300.cband.tech import LAYER, TECH
 
 
-@gf.cell
-def mmi2x2(
-    width: float = TECH.width,
-    width_taper: float = 1.5,
-    length_taper: float = 20.0,
-    length_mmi: float = 42.5,
-    width_mmi: float = 6.0,
-    gap_mmi: float = 0.5,
-    cross_section: CrossSectionSpec = "strip",
-) -> gf.Component:
-    """An mmi2x2.
+# @gf.cell
+# def mmi2x2(
+#     width: float = TECH.width,
+#     width_taper: float = 1.5,
+#     length_taper: float = 20.0,
+#     length_mmi: float = 42.5,
+#     width_mmi: float = 6.0,
+#     gap_mmi: float = 0.5,
+#     cross_section: CrossSectionSpec = "strip",
+# ) -> gf.Component:
+#     """An mmi2x2.
 
-    An mmi2x2 is a 2x2 splitter
+#     An mmi2x2 is a 2x2 splitter
 
-    Args:
-        width: the width of the waveguides connecting at the mmi ports
-        width_taper: the width at the base of the mmi body
-        length_taper: the length of the tapers going towards the mmi body
-        length_mmi: the length of the mmi body
-        width_mmi: the width of the mmi body
-        gap_mmi: the gap between the tapers at the mmi body
-        cross_section: a cross section or its name or a function generating a cross section.
-    """
-    return gf.c.mmi2x2(
-        width=width,
-        width_taper=width_taper,
-        length_taper=length_taper,
-        length_mmi=length_mmi,
-        width_mmi=width_mmi,
-        gap_mmi=gap_mmi,
-        cross_section=cross_section,
-    )
+#     Args:
+#         width: the width of the waveguides connecting at the mmi ports
+#         width_taper: the width at the base of the mmi body
+#         length_taper: the length of the tapers going towards the mmi body
+#         length_mmi: the length of the mmi body
+#         width_mmi: the width of the mmi body
+#         gap_mmi: the gap between the tapers at the mmi body
+#         cross_section: a cross section or its name or a function generating a cross section.
+#     """
+#     return gf.c.mmi2x2(
+#         width=width,
+#         width_taper=width_taper,
+#         length_taper=length_taper,
+#         length_mmi=length_mmi,
+#         width_mmi=width_mmi,
+#         gap_mmi=gap_mmi,
+#         cross_section=cross_section,
+#     )
 
 
-mmi2x2_rib = partial(mmi2x2, length_mmi=44.8, gap_mmi=0.53, cross_section="rib")
+# mmi2x2_rib = partial(mmi2x2, length_mmi=44.8, gap_mmi=0.53, cross_section="rib")
 
-@gf.cell
-def mmi3x3(
-    width: float = TECH.width,
-    width_taper: float = 1.0,
-    length_taper: float = 10.0,
-    length_mmi: float = 20.0,
-    width_mmi: float = 6.0,
-    gap_mmi: float = 0.25,
-    taper: ComponentSpec = gf.components.taper,
-    straight: ComponentSpec = gf.components.straight,
-    cross_section: CrossSectionSpec = "strip",
-) -> Component:
-    c = gf.Component()
+# @gf.cell
+# def mmi3x3(
+#     width: float = TECH.width,
+#     width_taper: float = 1.0,
+#     length_taper: float = 10.0,
+#     length_mmi: float = 20.0,
+#     width_mmi: float = 6.0,
+#     gap_mmi: float = 0.25,
+#     taper: ComponentSpec = gf.components.taper,
+#     straight: ComponentSpec = gf.components.straight,
+#     cross_section: CrossSectionSpec = "strip",
+# ) -> Component:
+#     c = gf.Component()
 
-    gap_mmi = gf.snap.snap_to_grid(gap_mmi, grid_factor=2) #ajusta el gap a la rejilla para evitar decimales raros que queden fuera del grid
+#     gap_mmi = gf.snap.snap_to_grid(gap_mmi, grid_factor=2) #ajusta el gap a la rejilla para evitar decimales raros que queden fuera del grid
 
-    x = gf.get_cross_section(cross_section)
-    width = width or x.width
-    w_taper = width_taper
+#     x = gf.get_cross_section(cross_section)
+#     width = width or x.width
+#     w_taper = width_taper
 
-    _taper = gf.get_component(
-        taper,
-        length=length_taper,
-        width1=width,
-        width2=w_taper,
-        cross_section=cross_section,
-    )
+#     _taper = gf.get_component(
+#         taper,
+#         length=length_taper,
+#         width1=width,
+#         width2=w_taper,
+#         cross_section=cross_section,
+#     )
 
-    pitch = w_taper + gap_mmi
+#     pitch = w_taper + gap_mmi
 
-    y_bot = -pitch
-    y_mid = 0
-    y_top = +pitch
+#     y_bot = -pitch
+#     y_mid = 0
+#     y_top = +pitch
 
-    _ = c << gf.get_component(
-        straight,
-        length=length_mmi,
-        width=width_mmi,
-        cross_section=cross_section,
-    )
+#     _ = c << gf.get_component(
+#         straight,
+#         length=length_mmi,
+#         width=width_mmi,
+#         cross_section=cross_section,
+#     )
 
-    temp_component = Component() #para definir los puertos ideales (temporales)
+#     temp_component = Component() #para definir los puertos ideales (temporales)
 
-    ports = [
-        temp_component.add_port(
-            name="o1",
-            orientation=180,
-            center=(0, y_bot),
-            width=w_taper,
-            cross_section=x,
-        ),
-        temp_component.add_port(
-            name="o2",
-            orientation=180,
-            center=(0, y_mid),
-            width=w_taper,
-            cross_section=x,
-        ),
-        temp_component.add_port(
-            name="o3",
-            orientation=180,
-            center=(0, y_top),
-            width=w_taper,
-            cross_section=x,
-        ),
-        temp_component.add_port(
-            name="o4",
-            orientation=0,
-            center=(length_mmi, y_top),
-            width=w_taper,
-            cross_section=x,
-        ),
-        temp_component.add_port(
-            name="o5",
-            orientation=0,
-            center=(length_mmi, y_mid),
-            width=w_taper,
-            cross_section=x,
-        ),
-        temp_component.add_port(
-            name="o6",
-            orientation=0,
-            center=(length_mmi, y_bot),
-            width=w_taper,
-            cross_section=x,
-        ),
-    ]
+#     ports = [
+#         temp_component.add_port(
+#             name="o1",
+#             orientation=180,
+#             center=(0, y_bot),
+#             width=w_taper,
+#             cross_section=x,
+#         ),
+#         temp_component.add_port(
+#             name="o2",
+#             orientation=180,
+#             center=(0, y_mid),
+#             width=w_taper,
+#             cross_section=x,
+#         ),
+#         temp_component.add_port(
+#             name="o3",
+#             orientation=180,
+#             center=(0, y_top),
+#             width=w_taper,
+#             cross_section=x,
+#         ),
+#         temp_component.add_port(
+#             name="o4",
+#             orientation=0,
+#             center=(length_mmi, y_top),
+#             width=w_taper,
+#             cross_section=x,
+#         ),
+#         temp_component.add_port(
+#             name="o5",
+#             orientation=0,
+#             center=(length_mmi, y_mid),
+#             width=w_taper,
+#             cross_section=x,
+#         ),
+#         temp_component.add_port(
+#             name="o6",
+#             orientation=0,
+#             center=(length_mmi, y_bot),
+#             width=w_taper,
+#             cross_section=x,
+#         ),
+#     ]
 
-    for port in ports:
-        taper_ref = c << _taper
-        taper_ref.connect(
-            port="o2",
-            other=port,
-            allow_width_mismatch=True,
-        )
-        c.add_port(name=port.name, port=taper_ref.ports["o1"])
+#     for port in ports:
+#         taper_ref = c << _taper
+#         taper_ref.connect(
+#             port="o2",
+#             other=port,
+#             allow_width_mismatch=True,
+#         )
+#         c.add_port(name=port.name, port=taper_ref.ports["o1"])
 
-    c.flatten()
-    return c
+#     c.flatten()
+#     return c
 
-@gf.cell
-def spiral_upv(
-    radius: float = TECH.radius,
-    N_spr: int = 5,
-    d_SPR: float = 7.0,
-    dx_SPR: float = 10.0,
-    dy_SPR: float = 10.0,
-    layer: CrossSectionSpec = "strip",
-    ) -> gf.Component:
+# @gf.cell
+# def spiral_upv(
+#     radius: float = TECH.radius,
+#     N_spr: int = 5,
+#     d_SPR: float = 7.0,
+#     dx_SPR: float = 10.0,
+#     dy_SPR: float = 10.0,
+#     layer: CrossSectionSpec = "strip",
+#     ) -> gf.Component:
    
-    """Returns a spiral.
+#     """Returns a spiral.
  
-    Pending: add ports, check whether it works as other (native) spirals
-    Use partial with this?
+#     Pending: add ports, check whether it works as other (native) spirals
+#     Use partial with this?
  
-    Args:
-        radius: spiral radius.
-        N_spr: order-number of loops (0,1,...)
-        d_SPR: waveguide separation
-        dx_SPR: spiral straight extent in x
-        dy_SPR: spiral straight extent in y
-        layer: extruding in a specified layer (or cross section)
-    """
+#     Args:
+#         radius: spiral radius.
+#         N_spr: order-number of loops (0,1,...)
+#         d_SPR: waveguide separation
+#         dx_SPR: spiral straight extent in x
+#         dy_SPR: spiral straight extent in y
+#         layer: extruding in a specified layer (or cross section)
+#     """
  
-    # Path definitions
-    P = gf.Path()
-    P1 = gf.Path()
-    P2 = gf.Path()
+#     # Path definitions
+#     P = gf.Path()
+#     P1 = gf.Path()
+#     P2 = gf.Path()
  
-    # Involed lengths
-    lx0 = gf.path.straight(dx_SPR + d_SPR + 2*radius)
-    ldy = gf.path.straight(dy_SPR)
-    ld = gf.path.straight(d_SPR)
-    ly0 = ldy+ld
+#     # Involed lengths
+#     lx0 = gf.path.straight(dx_SPR + d_SPR + 2*radius)
+#     ldy = gf.path.straight(dy_SPR)
+#     ld = gf.path.straight(d_SPR)
+#     ly0 = ldy+ld
  
-    # 90 degree curves
-    parcL = gf.path.arc(radius=radius, angle=90)
-    parcR = gf.path.arc(radius=radius, angle=-90)
+#     # 90 degree curves
+#     parcL = gf.path.arc(radius=radius, angle=90)
+#     parcR = gf.path.arc(radius=radius, angle=-90)
  
-    # Zero-th order
-    P01 = ld+ld + ly0 + parcL + lx0 + parcL + ly0 + parcL + gf.path.straight(dx_SPR/2)
-    P02 = gf.path.straight(dx_SPR/2) + parcR + ly0
-    P0 =  P01 + parcL + ldy + parcR + P02
+#     # Zero-th order
+#     P01 = ld+ld + ly0 + parcL + lx0 + parcL + ly0 + parcL + gf.path.straight(dx_SPR/2)
+#     P02 = gf.path.straight(dx_SPR/2) + parcR + ly0
+#     P0 =  P01 + parcL + ldy + parcR + P02
  
-    P = P0
-    lx = lx0
-    ly = ly0 + ld + ld
+#     P = P0
+#     lx = lx0
+#     ly = ly0 + ld + ld
  
-    # Generating loops
-    for i in range(1,N_spr+1):
+#     # Generating loops
+#     for i in range(1,N_spr+1):
    
-        if i == N_spr:
-            if i % 2 == 1:
-             P1 = parcR + (lx) + parcR + (ly) + parcR + (lx+ld+ld) + parcR + (ly+ld)
-             P = P + P1
-            else:
-             P1 = (ly+ld) + parcL + (lx+ld+ld) + parcL + (ly) + parcL + (lx) + parcL
-             P = P1 + P
-        else:  
-            if i % 2 == 1:
-             P1 = parcR + (lx) + parcR + (ly) + parcR + (lx+ld+ld) + parcR + (ly+ld+ld)
-             P = P + P1
-            else:
-             P1 = (ly+ld+ld) + parcL + (lx+ld+ld) + parcL + (ly) + parcL + (lx) + parcL
-             P = P1 + P
+#         if i == N_spr:
+#             if i % 2 == 1:
+#              P1 = parcR + (lx) + parcR + (ly) + parcR + (lx+ld+ld) + parcR + (ly+ld)
+#              P = P + P1
+#             else:
+#              P1 = (ly+ld) + parcL + (lx+ld+ld) + parcL + (ly) + parcL + (lx) + parcL
+#              P = P1 + P
+#         else:  
+#             if i % 2 == 1:
+#              P1 = parcR + (lx) + parcR + (ly) + parcR + (lx+ld+ld) + parcR + (ly+ld+ld)
+#              P = P + P1
+#             else:
+#              P1 = (ly+ld+ld) + parcL + (lx+ld+ld) + parcL + (ly) + parcL + (lx) + parcL
+#              P = P1 + P
        
-        lx = lx + ld + ld
-        ly = ly + ld + ld
+#         lx = lx + ld + ld
+#         ly = ly + ld + ld
  
    
-    # End feet
-    if N_spr % 2 == 1: P =  (lx + parcL) + P + parcL
-    else: P =  parcR + P + (parcR + lx)
+#     # End feet
+#     if N_spr % 2 == 1: P =  (lx + parcL) + P + parcL
+#     else: P =  parcR + P + (parcR + lx)
  
-    # f = P.plot()
+#     # f = P.plot()
  
-    # if N_spr % 2 == 0:
-        # P = P.rotate(90)
-        # P = P.()
-        # P = P.(
-        # p1=(0, 1), p2=(0, 0))
+#     # if N_spr % 2 == 0:
+#         # P = P.rotate(90)
+#         # P = P.()
+#         # P = P.(
+#         # p1=(0, 1), p2=(0, 0))
  
-    # Extrude
-    PDK = gf.get_active_pdk()
-    PDK.activate()
-    c = gf.path.extrude(P, cross_section=layer)
+#     # Extrude
+#     PDK = gf.get_active_pdk()
+#     PDK.activate()
+#     c = gf.path.extrude(P, cross_section=layer)
  
-    spr_length = P.length()
-    c.info["length"] = float(gf.snap.snap_to_grid(spr_length))
-    c.info["lx_final"] = float(lx.length())
+#     spr_length = P.length()
+#     c.info["length"] = float(gf.snap.snap_to_grid(spr_length))
+#     c.info["lx_final"] = float(lx.length())
  
-    return c
+#     return c
 
-from scipy.optimize import minimize
-import numpy as np
+# from scipy.optimize import minimize
+# import numpy as np
  
 
-def define_spiral_length(delay_length=10000,
-                         N_spr=7,
-                         radius=125,
-                         d_SPR=10,
-                         dy_SPR=20,
-                         ):
-    """Defines the spiral straight length based on the desired delay_length"""
-    print("Defining spiral length for delay:", delay_length)
-    def f(x):
-        spiral_to_test = partial(spiral_upv, N_spr=N_spr ,dx_SPR=x[0], radius=radius, d_SPR=d_SPR, dy_SPR=dy_SPR)
-        device = spiral_to_test()
-        current_delay_length = device.info["length"]
-        #print("Current spiral length:", current_delay_length, "for dx_SPR:", x[0])
-        cost = current_delay_length - delay_length
-        return np.abs(cost)
-    length_spiral = minimize(f, x0=np.array(200.0), method='Nelder-Mead',tol=1e-2, bounds=((10, 5000.0),)).x[0]
-    print("Spiral length set to:", length_spiral)
-    return length_spiral
+# def define_spiral_length(delay_length=10000,
+#                          N_spr=7,
+#                          radius=125,
+#                          d_SPR=10,
+#                          dy_SPR=20,
+#                          ):
+#     """Defines the spiral straight length based on the desired delay_length"""
+#     print("Defining spiral length for delay:", delay_length)
+#     def f(x):
+#         spiral_to_test = partial(spiral_upv, N_spr=N_spr ,dx_SPR=x[0], radius=radius, d_SPR=d_SPR, dy_SPR=dy_SPR)
+#         device = spiral_to_test()
+#         current_delay_length = device.info["length"]
+#         #print("Current spiral length:", current_delay_length, "for dx_SPR:", x[0])
+#         cost = current_delay_length - delay_length
+#         return np.abs(cost)
+#     length_spiral = minimize(f, x0=np.array(200.0), method='Nelder-Mead',tol=1e-2, bounds=((10, 5000.0),)).x[0]
+#     print("Spiral length set to:", length_spiral)
+#     return length_spiral
 
-@gf.cell
-def bend_euler(
-    radius: float = TECH.radius_strip,
-    angle: float = 90,
-    p: float = 0.5,
-    width: float = TECH.width,
-    cross_section: CrossSectionSpec = "strip",
-    allow_min_radius_violation: bool = False,
-) -> gf.Component:
-    """Regular degree euler bend.
+# @gf.cell
+# def bend_euler(
+#     radius: float = TECH.radius_strip,
+#     angle: float = 90,
+#     p: float = 0.5,
+#     width: float = TECH.width,
+#     cross_section: CrossSectionSpec = "strip",
+#     allow_min_radius_violation: bool = False,
+# ) -> gf.Component:
+#     """Regular degree euler bend.
 
-    Args:
-        radius: in um. Defaults to cross_section_radius.
-        angle: total angle of the curve.
-        p: Proportion of the curve that is an Euler curve.
-        width: width to use. Defaults to cross_section.width.
-        cross_section: specification (CrossSection, string, CrossSectionFactory dict).
-        allow_min_radius_violation: if True allows radius to be smaller than cross_section radius.
-    """
-    return gf.c.bend_euler(
-        radius=radius,
-        angle=angle,
-        p=p,
-        width=width,
-        cross_section=cross_section,
-        allow_min_radius_violation=allow_min_radius_violation,
-        with_arc_floorplan=True,
-        npoints=None,
-        layer=None,
-    )
+#     Args:
+#         radius: in um. Defaults to cross_section_radius.
+#         angle: total angle of the curve.
+#         p: Proportion of the curve that is an Euler curve.
+#         width: width to use. Defaults to cross_section.width.
+#         cross_section: specification (CrossSection, string, CrossSectionFactory dict).
+#         allow_min_radius_violation: if True allows radius to be smaller than cross_section radius.
+#     """
+#     return gf.c.bend_euler(
+#         radius=radius,
+#         angle=angle,
+#         p=p,
+#         width=width,
+#         cross_section=cross_section,
+#         allow_min_radius_violation=allow_min_radius_violation,
+#         with_arc_floorplan=True,
+#         npoints=None,
+#         layer=None,
+#     )
 
 
-@gf.cell
-def bend_s(
-    size: Size = (50, 10),
-    cross_section: CrossSectionSpec = "strip",
-    width: float | None = None,
-    allow_min_radius_violation: bool = False,
-) -> gf.Component:
-    """Return S bend with bezier curve.
+# @gf.cell
+# def bend_s(
+#     size: Size = (50, 10),
+#     cross_section: CrossSectionSpec = "strip",
+#     width: float | None = None,
+#     allow_min_radius_violation: bool = False,
+# ) -> gf.Component:
+#     """Return S bend with bezier curve.
 
-    stores min_bend_radius property in self.info['min_bend_radius']
-    min_bend_radius depends on height and length
+#     stores min_bend_radius property in self.info['min_bend_radius']
+#     min_bend_radius depends on height and length
 
-    Args:
-        size: in x and y direction.
-        cross_section: spec.
-        width: width of the waveguide. If None, it will use the width of the cross_section.
-        allow_min_radius_violation: allows min radius violations.
-    """
-    return gf.c.bend_s(
-        size=size,
-        cross_section=cross_section,
-        npoints=99,
-        allow_min_radius_violation=allow_min_radius_violation,
-        width=width,
-    )
+#     Args:
+#         size: in x and y direction.
+#         cross_section: spec.
+#         width: width of the waveguide. If None, it will use the width of the cross_section.
+#         allow_min_radius_violation: allows min radius violations.
+#     """
+#     return gf.c.bend_s(
+#         size=size,
+#         cross_section=cross_section,
+#         npoints=99,
+#         allow_min_radius_violation=allow_min_radius_violation,
+#         width=width,
+#     )
 
 @gf.cell
 def die(dieL = 5000, dieW = 5000, border = 250, layer_box = "FLOORPLAN"):
@@ -451,39 +451,39 @@ def mmi_2x2_test(length_mmi_2x2: float = 262.9723, taper_width_mmi_2x2: float = 
 
     return c
 
-@gf.cell
-def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, altura_bends: float = 13.649999999999999, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
+# @gf.cell
+# def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, altura_bends: float = 13.649999999999999, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
 
-    c = gf.Component()
+#     c = gf.Component()
 
-    mmi_33 = c << mmi3x3(width= width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
-    b1 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b2 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b3 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    wvg = c << gf.components.straight(10, cross_section = "strip")
+#     mmi_33 = c << mmi3x3(width= width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
+#     b1 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+#     b2 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+#     b3 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+#     b4 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+#     wvg = c << gf.components.straight(10, cross_section = "strip")
     
-    b1.mirror_x()
-    b1.mirror_y()
-    b1.dmovex(mmi_33.ports["o1"].dx).dmovey(mmi_33.ports["o1"].dy)
-    b2.mirror_x()
-    b2.dmovex(mmi_33.ports["o3"].dx).dmovey(mmi_33.ports["o3"].dy)
-    b3.mirror_y()
-    b4.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
-    b3.dmovex(mmi_33.ports["o6"].dx).dmovey(mmi_33.ports["o6"].dy)
-    wvg.dmovex(mmi_33.ports["o5"].dx).dmovey(mmi_33.ports["o5"].dy)
+#     b1.mirror_x()
+#     b1.mirror_y()
+#     b1.dmovex(mmi_33.ports["o1"].dx).dmovey(mmi_33.ports["o1"].dy)
+#     b2.mirror_x()
+#     b2.dmovex(mmi_33.ports["o3"].dx).dmovey(mmi_33.ports["o3"].dy)
+#     b3.mirror_y()
+#     b4.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
+#     b3.dmovex(mmi_33.ports["o6"].dx).dmovey(mmi_33.ports["o6"].dy)
+#     wvg.dmovex(mmi_33.ports["o5"].dx).dmovey(mmi_33.ports["o5"].dy)
 
-    c.add_port(name = "o1", port = b2.ports["o2"], port_type = "optical")
-    c.add_port(name = "o2", port = b1.ports["o2"], port_type = "optical")
-    c.add_port(name = "o3", port = b4.ports["o2"], port_type = "optical")
-    c.add_port(name = "o4", port = wvg.ports["o2"], port_type = "optical")
-    c.add_port(name = "o5", port = b3.ports["o2"], port_type = "optical")
+#     c.add_port(name = "o1", port = b2.ports["o2"], port_type = "optical")
+#     c.add_port(name = "o2", port = b1.ports["o2"], port_type = "optical")
+#     c.add_port(name = "o3", port = b4.ports["o2"], port_type = "optical")
+#     c.add_port(name = "o4", port = wvg.ports["o2"], port_type = "optical")
+#     c.add_port(name = "o5", port = b3.ports["o2"], port_type = "optical")
     
-    #normalizar posición para que quede en (0,0)
-    x0, y0 = c.ports["o1"].dcenter
-    c.dmove((-x0, -y0))
+#     #normalizar posición para que quede en (0,0)
+#     x0, y0 = c.ports["o1"].dcenter
+#     c.dmove((-x0, -y0))
 
-    return c
+#     return c
 
 @gf.cell
 def spiral_delays_test(length_spiral: float = 2152.431640625, width : float = TECH.width, radius: float = TECH.radius ):
@@ -507,71 +507,74 @@ def spiral_delays_test(length_spiral: float = 2152.431640625, width : float = TE
 
     return c
 
-@gf.cell
-def mmi_ts(
-    mmi: ComponentSpec = "mmi2x2",
-    x_total: float = 10000,
-    x_margin: float = 250,
-    y_total: float = 3*127,
-    invert: bool = False,
-    n: int = 4,
-    add_terminators: bool = False,  
-) -> gf.Component:
-    c = gf.Component()
-    mmi = gf.get_component(mmi)
-    mmi_xsize = mmi['o3'].dx - mmi['o1'].dx
-    mmi_ysize = mmi['o2'].dy - mmi['o1'].dy
-    # print(mmi_xsize)
-    # print(mmi_ysize)
+# @gf.cell
+# def mmi_ts(
+#     mmi: ComponentSpec = "mmi2x2",
+#     x_total: float = 10000,
+#     x_margin: float = 250,
+#     y_total: float = 3*127,
+#     invert: bool = False,
+#     n: int = 4,
+#     add_terminators: bool = False,  
+# ) -> gf.Component:
+#     c = gf.Component()
+#     mmi = gf.get_component(mmi)
+#     mmi_xsize = mmi['o3'].dx - mmi['o1'].dx
+#     mmi_ysize = mmi['o2'].dy - mmi['o1'].dy
+#     # print(mmi_xsize)
+#     # print(mmi_ysize)
  
-    if n == 1:
-        x_pad = 0
-        y_pad = 0
-    else:
-        x_pad = (1/(n-1))*(x_total - 2*x_margin - n*mmi_xsize)
-        y_pad = (1/(n-1))*y_total - mmi_ysize
+#     if n == 1:
+#         x_pad = 0
+#         y_pad = 0
+#     else:
+#         x_pad = (1/(n-1))*(x_total - 2*x_margin - n*mmi_xsize)
+#         y_pad = (1/(n-1))*y_total - mmi_ysize
  
-    # print(x_pad)
-    # print(y_pad)
+#     # print(x_pad)
+#     # print(y_pad)
  
-    mmis = []
-    for i in np.arange(0,n):
-        mmis.append(c.add_ref(mmi))
-        mmis[i].dmovex(i*(x_pad+mmi_xsize)).dmovey((-1)**(int(invert))*i*(y_pad+mmi_ysize))
+#     mmis = []
+#     for i in np.arange(0,n):
+#         mmis.append(c.add_ref(mmi))
+#         mmis[i].dmovex(i*(x_pad+mmi_xsize)).dmovey((-1)**(int(invert))*i*(y_pad+mmi_ysize))
  
-    c.add_port(name = f'o1', port = mmis[0].ports['o1'])
-    c.add_port(name = f'o2', port = mmis[0].ports['o2'])
-    port_count = 2
+#     c.add_port(name = f'o1', port = mmis[0].ports['o1'])
+#     c.add_port(name = f'o2', port = mmis[0].ports['o2'])
+#     port_count = 2
  
-    # invert=False  -> variante "bar"  : conecta o3 -> o2 del siguiente, tap = o4
-    # invert=True   -> variante "cross": conecta o4 -> o2 del siguiente, tap = o3
-    cascade_out_port = "o4" if invert else "o3"
-    tap_port = "o3" if invert else "o4"
-    next_input_port = "o2"
-    unused_input_port = "o1"
+#     # invert=False  -> variante "bar"  : conecta o3 -> o2 del siguiente, tap = o4
+#     # invert=True   -> variante "cross": conecta o4 -> o2 del siguiente, tap = o3
+#     cascade_out_port = "o4" if invert else "o3"
+#     tap_port = "o3" if invert else "o4"
+#     next_input_port = "o2"
+#     unused_input_port = "o1"
  
-    for i, mmi_ref in enumerate(mmis):
-        if (i != (n-1)):
-            gf.routing.route_single_sbend(
-                c,
-                mmi_ref[cascade_out_port],            
-                mmis[i+1][next_input_port],          
-                cross_section='strip'
-            )
+#     for i, mmi_ref in enumerate(mmis):
+#         if (i != (n-1)):
+#             gf.routing.route_single_sbend(
+#                 c,
+#                 mmi_ref[cascade_out_port],            
+#                 mmis[i+1][next_input_port],          
+#                 cross_section='strip'
+#             )
  
-            if add_terminators:
-                term = c.add_ref(gf.components.terminator_spiral(number_of_loops=6,
-                                                                 min_bend_radius=35,
-                                                                 width_tip=0.6))
-                term.connect("o1", mmis[i+1].ports[unused_input_port])
+#             if add_terminators:
+#                 term = c.add_ref(gf.components.terminator_spiral(number_of_loops=6,
+#                                                                  min_bend_radius=35,
+#                                                                  width_tip=0.6))
+#                 term.connect("o1", mmis[i+1].ports[unused_input_port])
  
-            c.add_port(name = f'o{port_count+1}', port = mmi_ref.ports[tap_port])
-            port_count += 1
+#             c.add_port(name = f'o{port_count+1}', port = mmi_ref.ports[tap_port])
+#             port_count += 1
  
-    c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[cascade_out_port])
-    port_count += 1
-    c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[tap_port])
+#     c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[cascade_out_port])
+#     port_count += 1
+#     c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[tap_port])
  
-    return c
+#     return c
+
+# def terminator(number_of_loops: float=6, min_bend_radius = 125, width_tip = 0.6): 
+#     return gf.components.terminator_spiral(number_of_loops=number_of_loops, min_bend_radius=min_bend_radius, width_tip=width_tip)
  
 
