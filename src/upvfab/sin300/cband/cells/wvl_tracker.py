@@ -507,5 +507,71 @@ def spiral_delays_test(length_spiral: float = 2152.431640625, width : float = TE
 
     return c
 
-
+@gf.cell
+def mmi_ts(
+    mmi: ComponentSpec = "mmi2x2",
+    x_total: float = 10000,
+    x_margin: float = 250,
+    y_total: float = 3*127,
+    invert: bool = False,
+    n: int = 4,
+    add_terminators: bool = False,  
+) -> gf.Component:
+    c = gf.Component()
+    mmi = gf.get_component(mmi)
+    mmi_xsize = mmi['o3'].dx - mmi['o1'].dx
+    mmi_ysize = mmi['o2'].dy - mmi['o1'].dy
+    # print(mmi_xsize)
+    # print(mmi_ysize)
+ 
+    if n == 1:
+        x_pad = 0
+        y_pad = 0
+    else:
+        x_pad = (1/(n-1))*(x_total - 2*x_margin - n*mmi_xsize)
+        y_pad = (1/(n-1))*y_total - mmi_ysize
+ 
+    # print(x_pad)
+    # print(y_pad)
+ 
+    mmis = []
+    for i in np.arange(0,n):
+        mmis.append(c.add_ref(mmi))
+        mmis[i].dmovex(i*(x_pad+mmi_xsize)).dmovey((-1)**(int(invert))*i*(y_pad+mmi_ysize))
+ 
+    c.add_port(name = f'o1', port = mmis[0].ports['o1'])
+    c.add_port(name = f'o2', port = mmis[0].ports['o2'])
+    port_count = 2
+ 
+    # invert=False  -> variante "bar"  : conecta o3 -> o2 del siguiente, tap = o4
+    # invert=True   -> variante "cross": conecta o4 -> o2 del siguiente, tap = o3
+    cascade_out_port = "o4" if invert else "o3"
+    tap_port = "o3" if invert else "o4"
+    next_input_port = "o2"
+    unused_input_port = "o1"
+ 
+    for i, mmi_ref in enumerate(mmis):
+        if (i != (n-1)):
+            gf.routing.route_single_sbend(
+                c,
+                mmi_ref[cascade_out_port],            
+                mmis[i+1][next_input_port],          
+                cross_section='strip'
+            )
+ 
+            if add_terminators:
+                term = c.add_ref(gf.components.terminator_spiral(number_of_loops=6,
+                                                                 min_bend_radius=35,
+                                                                 width_tip=0.6))
+                term.connect("o1", mmis[i+1].ports[unused_input_port])
+ 
+            c.add_port(name = f'o{port_count+1}', port = mmi_ref.ports[tap_port])
+            port_count += 1
+ 
+    c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[cascade_out_port])
+    port_count += 1
+    c.add_port(name = f'o{port_count+1}', port = mmis[n-1].ports[tap_port])
+ 
+    return c
+ 
 
