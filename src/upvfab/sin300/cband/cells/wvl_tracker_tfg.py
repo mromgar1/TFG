@@ -419,3 +419,66 @@ def bend_s(
         allow_min_radius_violation=allow_min_radius_violation,
         width=width,
     )
+
+@gf.cell
+def wvl_tracker(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
+    c = gf.Component()
+   
+    mmi_95 = c << mmi_2x2_bends(length_mmi_2x2)
+    mmi_33 = c << mmi3x3(width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
+    spiral = c << spiral_upv(radius = radius, N_spr = 18 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 50.46, layer = "strip") # N must BE EVEN 
+
+    
+    
+    h = spiral.ports["o2"].dx - spiral.ports["o1"].dx
+    wvg_up = c << gf.components.straight(length = L, cross_section= "strip", width = width)
+
+    dy_mmi95 = mmi_95.ports["o3"].dy - mmi_95.ports["o4"].dy #para conectar los s_bend de forma que las entradas a los mmi queden a la misma altura
+    dy_mmi33 = mmi_33.ports["o3"].dy - mmi_33.ports["o1"].dy
+    h_bends_33 = ( dy_mmi95 - dy_mmi33)/2
+    b3 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+
+    wvg_up.dmove((mmi_95.ports['o3'].dx, mmi_95.ports['o3'].dy))
+    b3.dmirror_y()
+    b3.dmove((wvg_up.ports['o2'].dx, wvg_up.ports['o2'].dy))
+    mmi_33.dmove((b3.ports['o2'].dx + taper_length, b3.ports['o2'].dy - 3)) # 3 = Wt
+    b4.dmirror_x()
+    b4.dmirror_y()
+    b4.dmove((mmi_33.ports['o2'].dx, mmi_33.ports['o1'].dy))
+    
+    dx_spiral = np.abs(mmi_95.ports['o4'].dx - spiral.ports['o1'].dx)
+    dy_spiral = np.abs(mmi_95.ports['o4'].dy - spiral.ports['o1'].dy)
+
+    spiral.dmove((dx_spiral, -dy_spiral))
+
+    
+
+      #bends entrada y salida cto
+    b7 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b8 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    wvg = c << gf.components.straight(10, cross_section = "strip")
+    b7.mirror_y()
+    b8.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
+    b7.dmovex(mmi_33.ports["o6"].dx).dmovey(mmi_33.ports["o6"].dy)
+    wvg.dmovex(mmi_33.ports["o5"].dx).dmovey(mmi_33.ports["o5"].dy)
+
+
+
+    c.add_port(name = "o1", port = mmi_95.ports["o1"], port_type= "optical")
+    c.add_port(name = "o2", port = mmi_95.ports["o2"], port_type= "optical")
+    c.add_port(name = "o3", port = b8.ports["o2"], port_type= "optical")
+    c.add_port(name = "o4", port = wvg.ports["o2"], port_type= "optical")
+    c.add_port(name = "o5", port = b7.ports["o2"], port_type= "optical")
+
+
+    c.info["total_length_device"] = 2*taper_length + length_mmi_2x2 + 2*10 + h  + 2*taper_length + length_mmi_3x3 #2*10 es de los sbends
+    c.info["length_short_arm"] = h + 2*10
+    c.info["h_bends_33"] = h_bends_33
+
+    #normalizar posición para que quede en (0,0)
+    
+    x0, y0 = c.ports["o1"].dcenter
+    c.dmove((-x0, -y0))
+
+    return c 
