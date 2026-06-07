@@ -333,6 +333,9 @@ def spiral_upv(
     PDK = gf.get_active_pdk()
     PDK.activate()
     c = gf.path.extrude(P, cross_section=layer)
+
+    x0, y0 = c.ports["o1"].dcenter
+    c.dmove((-x0, -y0))
  
     spr_length = P.length()
     c.info["length"] = float(gf.snap.snap_to_grid(spr_length))
@@ -678,3 +681,69 @@ def mmi_ts(
  
     return c
 
+@gf.cell
+def die_with_gratings(
+    size: tuple[float, float] = (10000, 5000),
+    ngratings: int = 34,
+    grating_pitch: float = 125.0,
+    grating_coupler: ComponentSpec | None = "grating_coupler_rectangular",
+    cross_section: CrossSectionSpec = "strip",
+    layer_floorplan: LayerSpec = "FLOORPLAN",
+    edge_to_grating_distance: float = 150.0,
+    with_loopback: bool = False,
+    border: float = 125,
+) -> gf.Component:
+    """A die with grating couplers.
+
+    Args:
+        size: the size of the die, in um.
+        ngratings: the number of grating couplers.
+        grating_pitch: the pitch of the grating couplers, in um.
+        grating_coupler: the grating coupler component. None skips the grating couplers.
+        cross_section: the cross section.
+        layer_floorplan: the layer of the floorplan.
+        edge_to_grating_distance: the distance from the edge to the grating couplers, in um.
+        with_loopback: if True, adds a loopback between edge GCs. Only works for rotation = 90 for now.
+        border: the border size, in um.
+    """
+    c = gf.Component()
+    ob = gf.components.rectangle(
+        size=size, layer=layer_floorplan, centered=True, port_type=None
+    )
+    ib = gf.components.rectangle(
+        size=(size[0]-border*2,size[1]-border*2), centered=True, layer=layer_floorplan
+    )
+    #ib.dmovex(border).dmovey(border)
+    fp = c << gf.boolean(A=ob, B=ib, operation="A-B", layer=layer_floorplan)
+    xs, ys = size
+    x0 = xs / 2 + edge_to_grating_distance
+    if grating_coupler:
+        gca = gf.c.grating_coupler_array(
+            n=ngratings,
+            pitch=grating_pitch,
+            with_loopback=with_loopback,
+            grating_coupler=grating_coupler,
+            cross_section=cross_section,
+        )
+        left = c << gca
+        left.rotate(-90)
+        left.xmin = -xs / 2 + edge_to_grating_distance
+        left.y = fp.y
+        c.add_ports(left.ports, prefix="W")
+        right = c << gca
+        right.rotate(+90)
+        right.xmax = xs / 2 - edge_to_grating_distance
+        right.y = fp.y
+        c.add_ports(right.ports, prefix="E")
+
+    c.auto_rename_ports()
+    c.dmovex(0.5*size[0]).dmovey(0.5*size[1])
+    for i, port in enumerate(c.ports):
+        text = c.add_ref(gf.components.text(
+            text=f"P{i}", size=25, layer=LAYER.WG))
+        text.dmovex(port.dx+20).dmovey(port.dy+20)
+        text = c.add_ref(gf.components.text(
+            text=f"P{i}", size=25, layer=LAYER.HEATER))
+        text.dmovex(port.dx+20).dmovey(port.dy+20)
+        #print(port)
+    return c
