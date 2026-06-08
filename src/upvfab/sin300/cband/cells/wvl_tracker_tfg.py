@@ -697,6 +697,63 @@ def mmi_ts(
  
     return c
 
+@gf.cells
+def dummy_2x2(index: float = 21):
+    c = gf.Component()
+    width = 1
+    mmi33 = c << mmi_3x3_test()
+    term = terminator(number_of_loops=4, min_bend_radius=35, width_tip = 0.6, separation = 3)
+    term_middle = terminator(number_of_loops=1, min_bend_radius=10, width_tip = 0.6, separation = 1.5)
+
+    if index == 21 or index == 12 or index == 11:
+        t_aux = c << term
+        t_aux.mirror_x()
+        t_aux.connect(port = 'o1', other = mmi33.ports['o5'])
+
+        c.add_port(name = "o1", port = mmi33.ports["o1"], port_type = "optical")
+        c.add_port(name = "o2", port = mmi33.ports["o2"], port_type = "optical")
+        c.add_port(name = "o3", port = mmi33.ports["o3"], port_type = "optical")
+        c.add_port(name = "o4", port = mmi33.ports["o4"], port_type = "optical")
+
+    elif index == 31 or index == 13: 
+        t_aux = c << term_middle
+        t_aux.mirror_x()
+
+        b = c << bend_s(size = [50, 10], cross_section = "strip", width = width, allow_min_radius_violation = True)
+        b.dmove((mmi33.ports['o4'].dx, mmi33.ports['o4'].dy ))
+        t_aux.connect(port = 'o1', other = b.ports['o2'])
+
+        c.add_port(name = "o1", port = mmi33.ports["o1"], port_type = "optical")
+        c.add_port(name = "o2", port = mmi33.ports["o2"], port_type = "optical")
+        c.add_port(name = "o3", port = mmi33.ports["o3"], port_type = "optical")
+        c.add_port(name = "o4", port = mmi33.ports["o5"], port_type = "optical")
+
+    elif index == 33:
+        t_aux = c << term_middle
+        t_aux.mirror_x()
+
+        b = c << bend_s(size = [50, 10], cross_section = "strip", width = width, allow_min_radius_violation = True)
+        b.dmove((mmi33.ports['o4'].dx, mmi33.ports['o4'].dy ))
+        t_aux.connect(port = 'o1', other = b.ports['o2'])
+
+        c.add_port(name = "o1", port = mmi33.ports["o2"], port_type = "optical")
+        c.add_port(name = "o2", port = mmi33.ports["o1"], port_type = "optical")
+        c.add_port(name = "o3", port = mmi33.ports["o3"], port_type = "optical")
+        c.add_port(name = "o4", port = mmi33.ports["o5"], port_type = "optical")
+    
+    elif index == 23 or index == 32: 
+        t_aux = c << term 
+        t_aux.mirror_x()
+        t_aux.mirror_y()
+        t_aux.connect(port = 'o1', other = mmi33.ports['o3'])
+
+        c.add_port(name = "o1", port = mmi33.ports["o2"], port_type = "optical")
+        c.add_port(name = "o2", port = mmi33.ports["o1"], port_type = "optical")
+        c.add_port(name = "o3", port = mmi33.ports["o4"], port_type = "optical")
+        c.add_port(name = "o4", port = mmi33.ports["o5"], port_type = "optical")
+
+    return c
+
 @gf.cell
 def die_with_gratings(
     size: tuple[float, float] = (10000, 5000),
