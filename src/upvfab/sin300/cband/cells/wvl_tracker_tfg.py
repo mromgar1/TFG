@@ -633,7 +633,8 @@ def mmi_ts(
     y_total: float = 3*127,
     invert: bool = False,
     n: int = 4,
-    add_terminators: bool = False,  
+    add_terminators: bool = False, 
+    mirror_terminators : bool = False 
 ) -> gf.Component:
     c = gf.Component()
     mmi = gf.get_component(mmi)
@@ -681,7 +682,11 @@ def mmi_ts(
                 term = c.add_ref(gf.components.terminator_spiral(number_of_loops=4,
                                                                  min_bend_radius=35,
                                                                  width_tip=0.6))
-                term.connect("o1", mmis[i+1].ports[unused_input_port])
+                if mirror_terminators:
+                    term.mirror_y()
+                    term.connect("o1", mmis[i+1].ports[unused_input_port])
+                else:
+                    term.connect("o1", mmis[i+1].ports[unused_input_port])
  
             c.add_port(name = f'o{port_count+1}', port = mmi_ref.ports[tap_port])
             port_count += 1
