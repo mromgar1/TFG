@@ -589,7 +589,7 @@ def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float =
     b2 = c << bend_s(size = [50, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b3 = c << bend_s(size = [50, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b4 = c << bend_s(size = [50, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    wvg = c << gf.components.straight(10, cross_section = "strip")
+    wvg = c << gf.components.straight(50, cross_section = "strip")
     
     b1.mirror_x()
     b1.mirror_y()
@@ -600,11 +600,20 @@ def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float =
     b4.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
     b3.dmovex(mmi_33.ports["o6"].dx).dmovey(mmi_33.ports["o6"].dy)
     wvg.dmovex(mmi_33.ports["o5"].dx).dmovey(mmi_33.ports["o5"].dy)
-
     
+    wvg_term = c <<  gf.components.straight(length = 10, cross_section= "strip", width = width)
+    wvg_term.dmove((mmi_33.ports['o2'].dx - 10, mmi_33.ports['o2'].dy ))
+    b9 = c << bend_s(size = [50, 10], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b9.mirror_x()
+    b9.dmove((wvg_term.ports['o1'].dx, wvg_term.ports['o1'].dy ))
+    wvg_term_2 = c <<  gf.components.straight(length = 10, cross_section= "strip", width = width)
+    wvg_term_2.dmove((b9.ports['o2'].dx - 10, b9.ports['o2'].dy ))
+    term = c << terminator(number_of_loops= 1,min_bend_radius=10, separation = 0.3)
+    term.connect(port = 'o1', other = wvg_term_2.ports['o1'])
+   
 
-    c.add_port(name = "o1", port = b2.ports["o2"], port_type = "optical")
-    c.add_port(name = "o2", port = b1.ports["o2"], port_type = "optical")
+    c.add_port(name = "o2", port = b2.ports["o2"], port_type = "optical")
+    c.add_port(name = "o1", port = b1.ports["o2"], port_type = "optical")
     c.add_port(name = "o3", port = b4.ports["o2"], port_type = "optical")
     c.add_port(name = "o4", port = wvg.ports["o2"], port_type = "optical")
     c.add_port(name = "o5", port = b3.ports["o2"], port_type = "optical")
