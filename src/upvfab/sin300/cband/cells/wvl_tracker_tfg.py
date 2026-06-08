@@ -578,15 +578,17 @@ def wvl_tracker_with_term(length_spiral: float = 2120.00732421875, L = 3000,  le
 ################################################################################################################################################
 
 @gf.cell
-def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, altura_bends: float = 13.649999999999999, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
+def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
 
     c = gf.Component()
+    wvl_tracker = wvl_tracker_with_term()
+    altura_bends = wvl_tracker.info['h_bends_33']
 
     mmi_33 = c << mmi3x3(width= width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
-    b1 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b2 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b3 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b1 = c << bend_s(size = [50, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b2 = c << bend_s(size = [50, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [50, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [50, altura_bends], cross_section = "strip", width = width, allow_min_radius_violation = True)
     wvg = c << gf.components.straight(10, cross_section = "strip")
     
     b1.mirror_x()
