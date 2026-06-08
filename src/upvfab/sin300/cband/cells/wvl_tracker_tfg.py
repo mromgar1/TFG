@@ -424,7 +424,7 @@ def bend_s(
     )
 
 def terminator(number_of_loops: float=6, min_bend_radius = 125, width_tip = 0.6, separation = 1.5): 
-    return gf.components.terminator_spiral(number_of_loops=number_of_loops, min_bend_radius=min_bend_radius, width_tip=width_tip, separation = 1.5)
+    return gf.components.terminator_spiral(number_of_loops=number_of_loops, min_bend_radius=min_bend_radius, width_tip=width_tip, separation = separation)
  
 
 
@@ -678,7 +678,7 @@ def mmi_ts(
             )
  
             if add_terminators:
-                term = c.add_ref(gf.components.terminator_spiral(number_of_loops=6,
+                term = c.add_ref(gf.components.terminator_spiral(number_of_loops=4,
                                                                  min_bend_radius=35,
                                                                  width_tip=0.6))
                 term.connect("o1", mmis[i+1].ports[unused_input_port])
