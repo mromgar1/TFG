@@ -697,7 +697,7 @@ def mmi_ts(
  
     return c
 
-@gf.cells
+@gf.cell
 def dummy_2x2(index: float = 21):
     c = gf.Component()
     width = 1
