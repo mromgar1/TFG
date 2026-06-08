@@ -186,7 +186,7 @@ def strip(
     width: float = TECH.width,
     layer: LayerSpec = "WG",
     radius: float = TECH.radius,
-    radius_min: float = 5, # TBD: Define minimum radius in the PDK
+    radius_min: float = 35, # TBD: Define minimum radius in the PDK
 ) -> CrossSection:
     """Return Strip cross_section."""
     return gf.cross_section.cross_section(

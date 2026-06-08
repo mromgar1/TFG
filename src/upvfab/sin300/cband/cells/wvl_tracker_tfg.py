@@ -121,14 +121,14 @@ def mmi_2x2_bends(length_mmi_2x2: float = 262.9723, width: float = TECH.width):
     c = gf.Component()
 
     mmi_95 = c << b_symmetric_mmi(length_mmi_2x2)
-    b1 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b2 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b1 = c << bend_s(size = [50, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b2 = c << bend_s(size = [50, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b1.mirror_y()
     b1.dmovex(mmi_95.ports['o4'].dx).dmovey(mmi_95.ports['o4'].dy)
     b2.dmovex(mmi_95.ports["o3"].dx).dmovey(mmi_95.ports["o3"].dy)
 
-    b3 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [50, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [50, 15], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b3.mirror_x()
     b3.mirror_y()
     b3.dmovex(mmi_95.ports["o1"].dx).dmovey(mmi_95.ports["o1"].dy)
@@ -450,8 +450,8 @@ def wvl_tracker(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2
     dy_mmi95 = mmi_95.ports["o3"].dy - mmi_95.ports["o4"].dy #para conectar los s_bend de forma que las entradas a los mmi queden a la misma altura
     dy_mmi33 = mmi_33.ports["o3"].dy - mmi_33.ports["o1"].dy
     h_bends_33 = ( dy_mmi95 - dy_mmi33)/2
-    b3 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
 
     wvg_up.dmove((mmi_95.ports['o3'].dx, mmi_95.ports['o3'].dy))
     b3.dmirror_y()
@@ -469,8 +469,8 @@ def wvl_tracker(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2
     
 
       #bends entrada y salida cto
-    b7 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b8 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b7 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b8 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
     wvg = c << gf.components.straight(10, cross_section = "strip")
     b7.mirror_y()
     b8.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
@@ -513,8 +513,8 @@ def wvl_tracker_with_term(length_spiral: float = 2120.00732421875, L = 3000,  le
     dy_mmi95 = mmi_95.ports["o3"].dy - mmi_95.ports["o4"].dy #para conectar los s_bend de forma que las entradas a los mmi queden a la misma altura
     dy_mmi33 = mmi_33.ports["o3"].dy - mmi_33.ports["o1"].dy
     h_bends_33 = ( dy_mmi95 - dy_mmi33)/2
-    b3 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b4 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b3 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b4 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
 
     wvg_up.dmove((mmi_95.ports['o3'].dx, mmi_95.ports['o3'].dy))
     b3.dmirror_y()
@@ -532,8 +532,8 @@ def wvl_tracker_with_term(length_spiral: float = 2120.00732421875, L = 3000,  le
     
 
       #bends entrada y salida cto
-    b7 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
-    b8 = c << bend_s(size = [10, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b7 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b8 = c << bend_s(size = [50, h_bends_33], cross_section = "strip", width = width, allow_min_radius_violation = True)
     wvg = c << gf.components.straight(10, cross_section = "strip")
     b7.mirror_y()
     b8.dmovex(mmi_33.ports["o4"].dx).dmovey(mmi_33.ports["o4"].dy)
@@ -543,7 +543,7 @@ def wvl_tracker_with_term(length_spiral: float = 2120.00732421875, L = 3000,  le
     wvg_term = c <<  gf.components.straight(length = 10, cross_section= "strip", width = width)
     wvg_term.dmove((mmi_33.ports['o2'].dx - 10, mmi_33.ports['o2'].dy ))
 
-    b9 = c << bend_s(size = [10, 10], cross_section = "strip", width = width, allow_min_radius_violation = True)
+    b9 = c << bend_s(size = [50, 10], cross_section = "strip", width = width, allow_min_radius_violation = True)
     b9.mirror_x()
     b9.dmove((wvg_term.ports['o1'].dx, wvg_term.ports['o1'].dy ))
     wvg_term_2 = c <<  gf.components.straight(length = 10, cross_section= "strip", width = width)
