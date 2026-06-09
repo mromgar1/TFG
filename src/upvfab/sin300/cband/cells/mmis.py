@@ -38,7 +38,7 @@ class Params_MMI2x2_C:
     gap_rib: float = 1.1  # Gap between tapers at MMI body for rib (um)
     
     # ===== Default Waveguide Width =====
-    default_width: float = 1.2  # Default waveguide width (um)
+    default_width: float = 1.0  # Default waveguide width (um)
 
 
 class Params_MMI2x2_L:
@@ -56,7 +56,7 @@ class Params_MMI2x2_L:
     gap_rib: float = 1.1  # Gap between tapers at MMI body for rib (um)
     
     # ===== Default Waveguide Width =====
-    default_width: float = 1.2  # Default waveguide width (um)
+    default_width: float = 1.0  # Default waveguide width (um)
 
 
 class Params_MMI2x2_S:
@@ -74,7 +74,7 @@ class Params_MMI2x2_S:
     gap_rib: float = 1.1  # Gap between tapers at MMI body for rib (um)
     
     # ===== Default Waveguide Width =====
-    default_width: float = 1.2  # Default waveguide width (um)
+    default_width: float = 1.0  # Default waveguide width (um)
 
 
 ################
@@ -96,7 +96,7 @@ class Params_MMI2x2_85_15_C:
     gap_rib: float = 3.1  # Gap between tapers at MMI body for rib (um)
     
     # ===== Default Waveguide Width =====
-    default_width: float = 1.2  # Default waveguide width (um)
+    default_width: float = 1.0  # Default waveguide width (um)
 
 
 class Params_MMI2x2_85_15_L:
@@ -114,7 +114,7 @@ class Params_MMI2x2_85_15_L:
     gap_rib: float = 3.1  # Gap between tapers at MMI body for rib (um)
     
     # ===== Default Waveguide Width =====
-    default_width: float = 1.2  # Default waveguide width (um)
+    default_width: float = 1.0  # Default waveguide width (um)
 
 
 class Params_MMI2x2_85_15_S:
@@ -132,7 +132,7 @@ class Params_MMI2x2_85_15_S:
     gap_rib: float = 3.1  # Gap between tapers at MMI body for rib (um)
     
     # ===== Default Waveguide Width =====
-    default_width: float = 1.2  # Default waveguide width (um)
+    default_width: float = 1.0  # Default waveguide width (um)
 
 
 ################
@@ -148,7 +148,7 @@ def _mmi2x2_with_sbends(
     gap_mmi: float,
     cross_section: CrossSectionSpec,
 ) -> gf.Component:
-    from pdk.CNM_UPVfab_SiN import PDK
+    from upvfab.sin300.cband import PDK
 
     mmi_c = gf.c.mmi2x2(
         width=width,
