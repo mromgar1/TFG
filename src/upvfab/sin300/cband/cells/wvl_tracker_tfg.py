@@ -435,12 +435,12 @@ def terminator(number_of_loops: float=6, min_bend_radius = 125, width_tip = 0.6,
 ##################################################################################################################################
 
 @gf.cell
-def wvl_tracker(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
+def wvl_tracker(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
    
     mmi_95 = c << mmi_2x2_bends(length_mmi_2x2)
     mmi_33 = c << mmi3x3(width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
-    spiral = c << spiral_upv(radius = radius, N_spr = 18 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 50.46, layer = "strip") # N must BE EVEN 
+    spiral = c << spiral_upv(radius = radius, N_spr = 18 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 33.76, layer = "strip") # N must BE EVEN 
 
     
     
@@ -498,12 +498,12 @@ def wvl_tracker(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2
     return c 
 
 
-def wvl_tracker_with_term(length_spiral: float = 2120.00732421875, L = 3000,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
+def wvl_tracker_with_term(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
    
     mmi_95 = c << mmi_2x2_bends(length_mmi_2x2)
     mmi_33 = c << mmi3x3(width, width_taper=taper_width_mmi_3x3, length_taper= taper_length, length_mmi = length_mmi_3x3, width_mmi= 10, gap_mmi = gap_mmi_3x3)
-    spiral = c << spiral_upv(radius = radius, N_spr = 18 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 50.46, layer = "strip") # N must BE EVEN 
+    spiral = c << spiral_upv(radius = radius, N_spr = 18 , d_SPR =10 , dx_SPR= length_spiral, dy_SPR = 33.76, layer = "strip") # N must BE EVEN 
 
     
     
