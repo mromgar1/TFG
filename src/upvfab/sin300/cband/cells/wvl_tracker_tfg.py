@@ -435,7 +435,7 @@ def terminator(number_of_loops: float=6, min_bend_radius = 125, width_tip = 0.6,
 ##################################################################################################################################
 
 @gf.cell
-def wvl_tracker(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =128.95,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
+def wvl_tracker(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =128.95,  taper_length = 50 + 20,   length_mmi_3x3: float =  150.9331, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.7,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
    
     mmi_95 = c << mmi_2x2_bends(length_mmi_2x2)
@@ -498,7 +498,7 @@ def wvl_tracker(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x
     return c 
 
 
-def wvl_tracker_with_term(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =128.95,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
+def wvl_tracker_with_term(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =128.95,  taper_length = 50 + 20,   length_mmi_3x3: float =  150.9331, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.7,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
    
     mmi_95 = c << mmi_2x2_bends(length_mmi_2x2)
@@ -578,7 +578,7 @@ def wvl_tracker_with_term(length_spiral: float =2220.00732421875, L = 3100,  len
 ################################################################################################################################################
 
 @gf.cell
-def mmi_3x3_test(length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2, taper_length: float = 10, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
+def mmi_3x3_test(length_mmi_3x3: float =  150.9331, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.7, taper_length: float = 70, width: float = TECH.width): #altura bends heredado de cto: h_bends_33
 
     c = gf.Component()
     wvl_tracker = wvl_tracker_with_term()
