@@ -14,7 +14,7 @@ from upvfab.sin300.cband.tech import LAYER, TECH
 # building blocks
 
 @gf.cell 
-def b_symmetric_mmi(L_mmi=144.7, W_mmi=10, Aw = 0.72, L_wg=20, lt=50, wt=1.0, Wt=3, d_io=1.97, layer="WG"):
+def b_symmetric_mmi(L_mmi=128.95, W_mmi=10, Aw = 0.72, L_wg=20, lt=50, wt=1.0, Wt=3, d_io=1.97, layer="WG"):
 
     c = gf.Component()
     W_narrow= W_mmi - Aw
@@ -117,7 +117,7 @@ def b_symmetric_mmi(L_mmi=144.7, W_mmi=10, Aw = 0.72, L_wg=20, lt=50, wt=1.0, Wt
     return c
 
 @gf.cell
-def mmi_2x2_bends(length_mmi_2x2: float = 262.9723, width: float = TECH.width):
+def mmi_2x2_bends(length_mmi_2x2: float = 128.95, width: float = TECH.width):
     c = gf.Component()
 
     mmi_95 = c << b_symmetric_mmi(length_mmi_2x2)
@@ -435,7 +435,7 @@ def terminator(number_of_loops: float=6, min_bend_radius = 125, width_tip = 0.6,
 ##################################################################################################################################
 
 @gf.cell
-def wvl_tracker(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
+def wvl_tracker(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =128.95,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
    
     mmi_95 = c << mmi_2x2_bends(length_mmi_2x2)
@@ -498,7 +498,7 @@ def wvl_tracker(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x
     return c 
 
 
-def wvl_tracker_with_term(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =126.3,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
+def wvl_tracker_with_term(length_spiral: float =2220.00732421875, L = 3100,  length_mmi_2x2: float =128.95,  taper_length = 50 + 20,   length_mmi_3x3: float =  242.4723, taper_width_mmi_3x3: float = 2.8, gap_mmi_3x3: float = 0.2,  width: float = TECH.width, radius: float =  TECH.radius): #mejorarlo poniendo las funciones de espiral dentro
     c = gf.Component()
    
     mmi_95 = c << mmi_2x2_bends(length_mmi_2x2)
