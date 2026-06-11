@@ -821,6 +821,7 @@ def die_with_gratings(
         #print(port)
     return c
 
+
 #ART 
 @gf.cell
 def star(
