@@ -548,7 +548,7 @@ def wvl_tracker_with_term(length_spiral: float =2220.00732421875, L = 3100,  len
     b9.dmove((wvg_term.ports['o1'].dx, wvg_term.ports['o1'].dy ))
     wvg_term_2 = c <<  gf.components.straight(length = 10, cross_section= "strip", width = width)
     wvg_term_2.dmove((b9.ports['o2'].dx - 10, b9.ports['o2'].dy ))
-    term = c << terminator(number_of_loops= 1,min_bend_radius=10, separation = 0.3)
+    term = c << terminator(number_of_loops= 1,min_bend_radius=10, separation = 1.5)
     term.connect(port = 'o1', other = wvg_term_2.ports['o1'])
    
 
@@ -608,7 +608,7 @@ def mmi_3x3_test(length_mmi_3x3: float =  150.9331, taper_width_mmi_3x3: float =
     b9.dmove((wvg_term.ports['o1'].dx, wvg_term.ports['o1'].dy ))
     wvg_term_2 = c <<  gf.components.straight(length = 10, cross_section= "strip", width = width)
     wvg_term_2.dmove((b9.ports['o2'].dx - 10, b9.ports['o2'].dy ))
-    term = c << terminator(number_of_loops= 1,min_bend_radius=10, separation = 0.3)
+    term = c << terminator(number_of_loops= 1,min_bend_radius=10, separation = 1.5)
     term.connect(port = 'o1', other = wvg_term_2.ports['o1'])
    
 
@@ -626,7 +626,7 @@ def mmi_3x3_test(length_mmi_3x3: float =  150.9331, taper_width_mmi_3x3: float =
 
 
 @gf.cell
-def mmi_ts(
+def mmi_ts_mine(
     mmi: ComponentSpec = "mmi2x2",
     x_total: float = 10000,
     x_margin: float = 250,
@@ -811,12 +811,12 @@ def die_with_gratings(
 
     c.auto_rename_ports()
     c.dmovex(0.5*size[0]).dmovey(0.5*size[1])
-    for i, port in enumerate(c.ports):
-        text = c.add_ref(gf.components.text(
-            text=f"P{i}", size=25, layer=LAYER.WG))
-        text.dmovex(port.dx+20).dmovey(port.dy+20)
-        text = c.add_ref(gf.components.text(
-            text=f"P{i}", size=25, layer=LAYER.HEATER))
-        text.dmovex(port.dx+20).dmovey(port.dy+20)
+    # for i, port in enumerate(c.ports):
+    #     text = c.add_ref(gf.components.text(
+    #         text=f"P{i}", size=25, layer=LAYER.WG))
+    #     text.dmovex(port.dx+20).dmovey(port.dy+20)
+    #     text = c.add_ref(gf.components.text(
+    #         text=f"P{i}", size=25, layer=LAYER.HEATER))
+    #     text.dmovex(port.dx+20).dmovey(port.dy+20)
         #print(port)
     return c
