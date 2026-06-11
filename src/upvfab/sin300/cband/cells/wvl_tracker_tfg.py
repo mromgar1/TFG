@@ -820,3 +820,24 @@ def die_with_gratings(
     #     text.dmovex(port.dx+20).dmovey(port.dy+20)
         #print(port)
     return c
+
+#ART 
+@gf.cell
+def star(
+    n_points: int = 5,
+    r_outer: float = 10,
+    r_inner: float = 4,
+    layer: tuple[int, int] = (1, 0),
+) -> gf.Component:
+    c = gf.Component()
+
+    points = []
+    for i in range(2 * n_points):
+        angle = np.pi / 2 + i * np.pi / n_points
+        r = r_outer if i % 2 == 0 else r_inner
+        x = r * np.cos(angle)
+        y = r * np.sin(angle)
+        points.append((x, y))
+
+    c.add_polygon(points, layer=layer)
+    return c
